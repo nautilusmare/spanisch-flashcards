@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Español">
+<meta name="theme-color" content="#1a1a2e">
+<title>Español — Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #1a1a2e;
+    --card: #1e1e35;
+    --accent: #e8b86d;
+    --accent2: #7c6fff;
+    --text: #f0ede8;
+    --muted: #7a7a9a;
+    --success: #4ecb91;
+    --danger: #e86d6d;
+    --warn: #e8b86d;
+    --radius: 20px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex-direction: column; height: 100%; }
+  .screen.active { display: flex; }
+
+  /* ── HOME SCREEN ── */
+  #home {
+    background: radial-gradient(ellipse at 30% 20%, #2a1f5e 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, #1f3a2a 0%, transparent 50%),
+                var(--bg);
+    padding: 0 28px;
+    padding-bottom: calc(28px + var(--safe-bottom));
+    justify-content: space-between;
+  }
+
+  .home-top {
+    padding-top: calc(60px + env(safe-area-inset-top, 0px));
+  }
+
+  .home-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .home-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text);
+  }
+
+  .home-title span { color: var(--accent); }
+
+  .home-sub {
+    margin-top: 16px;
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    display: block;
+    letter-spacing: 0.05em;
+  }
+
+  .home-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #1a1000;
+    border: none;
+    border-radius: var(--radius);
+    padding: 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: transform 0.12s, opacity 0.12s;
+  }
+
+  .btn-primary:active { transform: scale(0.97); opacity: 0.85; }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.12s, background 0.12s;
+  }
+
+  .btn-secondary:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+
+  /* ── LEARN SCREEN ── */
+  #learn {
+    background: var(--bg);
+  }
+
+  .learn-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(env(safe-area-inset-top, 16px) + 16px) 20px 12px;
+  }
+
+  .learn-back {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.06);
+    border: none;
+    border-radius: 50%;
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .learn-progress-wrap { flex: 1; margin: 0 16px; }
+
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .learn-counter {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ── CARD AREA ── */
+  .card-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .flashcard {
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 3/4;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 28px;
+    text-align: center;
+  }
+
+  .card-front {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+  }
+
+  .card-back {
+    background: linear-gradient(145deg, #1e2e3e, #1a2a1a);
+    border: 1px solid rgba(78,203,145,0.15);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    transform: rotateY(180deg);
+  }
+
+  .card-category {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    background: rgba(232,184,109,0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  .card-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .card-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .card-tap-hint {
+    position: absolute;
+    bottom: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.7;
+  }
+
+  .card-translation {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: var(--success);
+    margin-bottom: 8px;
+  }
+
+  .card-example {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-style: italic;
+    margin-top: 16px;
+    padding: 0 8px;
+  }
+
+  .card-example span { color: rgba(240,237,232,0.7); font-style: normal; }
+
+  /* ── ANSWER BUTTONS ── */
+  .answer-area {
+    padding: 0 24px;
+    padding-bottom: calc(24px + var(--safe-bottom));
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .answer-area.visible { display: flex; }
+
+  .answer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .btn-answer {
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.12s, opacity 0.12s;
+  }
+
+  .btn-answer:active { transform: scale(0.96); }
+
+  .btn-again { background: rgba(232,109,109,0.15); color: var(--danger); border: 1px solid rgba(232,109,109,0.25); }
+  .btn-hard  { background: rgba(232,184,109,0.1); color: var(--warn);   border: 1px solid rgba(232,184,109,0.2); }
+  .btn-good  { background: rgba(78,203,145,0.12); color: var(--success); border: 1px solid rgba(78,203,145,0.22); }
+  .btn-easy  { background: rgba(124,111,255,0.12); color: var(--accent2); border: 1px solid rgba(124,111,255,0.22); }
+
+  .btn-answer .btn-emoji { font-size: 20px; }
+  .btn-answer .btn-lbl { font-size: 12px; opacity: 0.85; }
+  .btn-answer .btn-days { font-size: 10px; opacity: 0.5; margin-top: 2px; }
+
+  /* ── STATS SCREEN ── */
+  #stats {
+    background: var(--bg);
+    padding: 0 24px;
+    padding-bottom: calc(24px + var(--safe-bottom));
+    overflow-y: auto;
+  }
+
+  .stats-header {
+    padding-top: calc(env(safe-area-inset-top, 20px) + 20px);
+    margin-bottom: 32px;
+  }
+
+  .stats-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--text);
+  }
+
+  .stats-header p { color: var(--muted); margin-top: 6px; font-size: 14px; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+
+  .stats-tile {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 20px 16px;
+  }
+
+  .stats-tile .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: var(--accent);
+  }
+
+  .stats-tile .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .level-section { margin-bottom: 24px; }
+  .level-title { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+  .level-bar-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .level-name { font-size: 13px; width: 60px; flex-shrink: 0; color: var(--text); }
+  .level-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .level-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+  .level-count { font-size: 12px; color: var(--muted); width: 30px; text-align: right; flex-shrink: 0; }
+
+  /* ── DONE SCREEN ── */
+  #done {
+    background: radial-gradient(ellipse at 50% 30%, #1f3a2a 0%, transparent 60%), var(--bg);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 32px;
+    padding-bottom: calc(40px + var(--safe-bottom));
+  }
+
+  .done-emoji { font-size: 64px; margin-bottom: 24px; }
+
+  .done-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .done-sub { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 280px; margin: 0 auto 40px; }
+
+  .done-stats { display: flex; gap: 24px; margin-bottom: 40px; }
+  .done-stat { text-align: center; }
+  .done-stat .n { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--accent); }
+  .done-stat .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.95); opacity: 0; }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .card-area { animation: pop 0.4s ease; }
+  .screen.active { animation: slideUp 0.3s ease; }
+
+  /* Swipe indicator */
+  .swipe-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <p class="home-eyebrow">Spaced Repetition</p>
+    <h1 class="home-title">Aprende<br><span>Español.</span></h1>
+    <p class="home-sub">500 der wichtigsten Vokabeln. Lerne täglich ein paar — der Algorithmus erledigt den Rest.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-num" id="home-due">—</span>
+      <span class="stat-lbl">Heute fällig</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="home-learned">0</span>
+      <span class="stat-lbl">Gelernt</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="home-streak">0</span>
+      <span class="stat-lbl">Tage Streak</span>
+    </div>
+  </div>
+
+  <div class="home-btns">
+    <button class="btn-primary" onclick="startSession()">Jetzt lernen →</button>
+    <button class="btn-secondary" onclick="showStats()">Statistiken &amp; Fortschritt</button>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div id="learn" class="screen">
+  <div class="learn-header">
+    <button class="learn-back" onclick="goHome()">←</button>
+    <div class="learn-progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+    <span class="learn-counter" id="queue-count">0</span>
+  </div>
+
+  <div class="card-area" id="card-area" onclick="flipCard()">
+    <div class="flashcard" id="flashcard">
+      <div class="card-face card-front">
+        <div class="card-category" id="card-cat">Substantiv</div>
+        <div class="card-word" id="card-word">—</div>
+        <div class="card-hint" id="card-hint"></div>
+        <div class="card-tap-hint">Tippen zum Umdrehen ↓</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-category" id="card-cat-b">Substantiv</div>
+        <div class="card-translation" id="card-trans">—</div>
+        <div class="card-example" id="card-example"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="answer-area" id="answer-area">
+    <div class="answer-row">
+      <button class="btn-answer btn-again" onclick="answer(0)">
+        <span class="btn-emoji">😶</span>
+        <span class="btn-lbl">Nochmal</span>
+        <span class="btn-days" id="days-again">&lt;1 min</span>
+      </button>
+      <button class="btn-answer btn-hard" onclick="answer(1)">
+        <span class="btn-emoji">🤔</span>
+        <span class="btn-lbl">Schwer</span>
+        <span class="btn-days" id="days-hard">1 Tag</span>
+      </button>
+    </div>
+    <div class="answer-row">
+      <button class="btn-answer btn-good" onclick="answer(2)">
+        <span class="btn-emoji">✓</span>
+        <span class="btn-lbl">Gut</span>
+        <span class="btn-days" id="days-good">3 Tage</span>
+      </button>
+      <button class="btn-answer btn-easy" onclick="answer(3)">
+        <span class="btn-emoji">⚡</span>
+        <span class="btn-lbl">Leicht</span>
+        <span class="btn-days" id="days-easy">7 Tage</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="stats" class="screen">
+  <div class="stats-header">
+    <button class="btn-secondary" style="width:auto;padding:10px 16px;font-size:13px;margin-bottom:20px" onclick="goHome()">← Zurück</button>
+    <h2>Dein Fortschritt</h2>
+    <p>Überblick über deinen Lernstand</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stats-tile"><div class="num" id="s-total">0</div><div class="lbl">Karten gesehen</div></div>
+    <div class="stats-tile"><div class="num" id="s-mastered">0</div><div class="lbl">Gemeistert</div></div>
+    <div class="stats-tile"><div class="num" id="s-streak">0</div><div class="lbl">Tage Streak</div></div>
+    <div class="stats-tile"><div class="num" id="s-accuracy">—</div><div class="lbl">Trefferquote</div></div>
+  </div>
+
+  <div class="level-section">
+    <div class="level-title">Karten nach Level</div>
+    <div class="level-bar-wrap"><div class="level-name">Neu</div><div class="level-bar"><div class="level-fill" id="lb-new" style="background:var(--muted)"></div></div><div class="level-count" id="lc-new">0</div></div>
+    <div class="level-bar-wrap"><div class="level-name">Lernend</div><div class="level-bar"><div class="level-fill" id="lb-learn" style="background:var(--warn)"></div></div><div class="level-count" id="lc-learn">0</div></div>
+    <div class="level-bar-wrap"><div class="level-name">Gut</div><div class="level-bar"><div class="level-fill" id="lb-good" style="background:var(--success)"></div></div><div class="level-count" id="lc-good">0</div></div>
+    <div class="level-bar-wrap"><div class="level-name">Gemeistert</div><div class="level-bar"><div class="level-fill" id="lb-master" style="background:var(--accent2)"></div></div><div class="level-count" id="lc-master">0</div></div>
+  </div>
+
+  <button class="btn-primary" onclick="showStats(); startSession()" style="margin-top:8px">Weiter lernen →</button>
+  <button class="btn-secondary" onclick="if(confirm('Alle Daten löschen?')) resetAll()" style="margin-top:10px">Daten zurücksetzen</button>
+</div>
+
+<!-- DONE -->
+<div id="done" class="screen">
+  <div class="done-emoji">🎉</div>
+  <h2 class="done-title">Sitzung abgeschlossen!</h2>
+  <p class="done-sub">Großartig. Komm morgen wieder — Wiederholungen festigen das Gedächtnis.</p>
+  <div class="done-stats">
+    <div class="done-stat"><div class="n" id="done-correct">0</div><div class="l">Richtig</div></div>
+    <div class="done-stat"><div class="n" id="done-cards">0</div><div class="l">Karten</div></div>
+    <div class="done-stat"><div class="n" id="done-new">0</div><div class="l">Neue</div></div>
+  </div>
+  <button class="btn-primary" onclick="goHome()" style="width:100%">Fertig</button>
+</div>
+
+<script>
+// ── VOCABULARY DATA (500 most common Spanish words) ──
+const VOCAB = [
+  // BASICS & ARTICLES
+  {es:"el",de:"der (mask. Artikel)",cat:"Artikel",ex:"El libro es interesante."},
+  {es:"la",de:"die (fem. Artikel)",cat:"Artikel",ex:"La casa es grande."},
+  {es:"los",de:"die (mask. Plural)",cat:"Artikel",ex:"Los niños juegan."},
+  {es:"las",de:"die (fem. Plural)",cat:"Artikel",ex:"Las flores son bonitas."},
+  {es:"un",de:"ein (mask.)",cat:"Artikel",ex:"Un perro corre."},
+  {es:"una",de:"eine (fem.)",cat:"Artikel",ex:"Una niña canta."},
+  // PRONOUNS
+  {es:"yo",de:"ich",cat:"Pronomen",ex:"Yo soy estudiante."},
+  {es:"tú",de:"du",cat:"Pronomen",ex:"¿Tú hablas español?"},
+  {es:"él",de:"er",cat:"Pronomen",ex:"Él trabaja mucho."},
+  {es:"ella",de:"sie (Sg.)",cat:"Pronomen",ex:"Ella es médica."},
+  {es:"nosotros",de:"wir",cat:"Pronomen",ex:"Nosotros vivimos aquí."},
+  {es:"vosotros",de:"ihr (Spanien)",cat:"Pronomen",ex:"Vosotros coméis bien."},
+  {es:"ellos",de:"sie (mask. Pl.)",cat:"Pronomen",ex:"Ellos son amigos."},
+  {es:"ellas",de:"sie (fem. Pl.)",cat:"Pronomen",ex:"Ellas estudian."},
+  {es:"usted",de:"Sie (formell)",cat:"Pronomen",ex:"¿Usted habla alemán?"},
+  {es:"ustedes",de:"Sie/ihr (LA)",cat:"Pronomen",ex:"Ustedes son bienvenidos."},
+  {es:"me",de:"mich / mir",cat:"Pronomen",ex:"Me llamo Julius."},
+  {es:"te",de:"dich / dir",cat:"Pronomen",ex:"Te quiero."},
+  {es:"se",de:"sich",cat:"Pronomen",ex:"Él se llama Carlos."},
+  {es:"le",de:"ihm / ihr (indir.)",cat:"Pronomen",ex:"Le doy el libro."},
+  {es:"nos",de:"uns",cat:"Pronomen",ex:"Nos gusta la música."},
+  {es:"lo",de:"ihn / es (dir.)",cat:"Pronomen",ex:"Lo veo todos los días."},
+  {es:"la",de:"sie / es (dir.)",cat:"Pronomen",ex:"La conozco bien."},
+  {es:"mi",de:"mein",cat:"Pronomen",ex:"Mi casa es tu casa."},
+  {es:"tu",de:"dein",cat:"Pronomen",ex:"Tu libro está aquí."},
+  {es:"su",de:"sein / ihr / Ihr",cat:"Pronomen",ex:"Su coche es nuevo."},
+  {es:"nuestro",de:"unser",cat:"Pronomen",ex:"Nuestro equipo ganó."},
+  {es:"este",de:"dieser (mask.)",cat:"Pronomen",ex:"Este libro es mío."},
+  {es:"esta",de:"diese (fem.)",cat:"Pronomen",ex:"Esta ciudad es bonita."},
+  {es:"ese",de:"jener (mask.)",cat:"Pronomen",ex:"Ese hombre es mi padre."},
+  {es:"esa",de:"jene (fem.)",cat:"Pronomen",ex:"Esa es mi profesora."},
+  {es:"algo",de:"etwas",cat:"Pronomen",ex:"¿Quieres algo?"},
+  {es:"nada",de:"nichts",cat:"Pronomen",ex:"No quiero nada."},
+  {es:"alguien",de:"jemand",cat:"Pronomen",ex:"¿Hay alguien aquí?"},
+  {es:"nadie",de:"niemand",cat:"Pronomen",ex:"No hay nadie en casa."},
+  {es:"todo",de:"alles / ganz",cat:"Pronomen",ex:"Todo está bien."},
+  {es:"todos",de:"alle",cat:"Pronomen",ex:"Todos vienen mañana."},
+  // VERBS - ser/estar/tener/haber
+  {es:"ser",de:"sein (dauerhaft)",cat:"Verb",ex:"Soy alemán."},
+  {es:"estar",de:"sein (zustand)",cat:"Verb",ex:"Estoy cansado."},
+  {es:"tener",de:"haben",cat:"Verb",ex:"Tengo un perro."},
+  {es:"haber",de:"haben (Hilfsv.)",cat:"Verb",ex:"He comido bien."},
+  {es:"hacer",de:"machen / tun",cat:"Verb",ex:"¿Qué haces?"},
+  {es:"poder",de:"können",cat:"Verb",ex:"Puedo ayudarte."},
+  {es:"querer",de:"wollen / lieben",cat:"Verb",ex:"Quiero aprender español."},
+  {es:"saber",de:"wissen / können",cat:"Verb",ex:"Sé hablar inglés."},
+  {es:"deber",de:"müssen / sollen",cat:"Verb",ex:"Debes estudiar más."},
+  {es:"ir",de:"gehen / fahren",cat:"Verb",ex:"Voy al supermercado."},
+  {es:"venir",de:"kommen",cat:"Verb",ex:"¿De dónde vienes?"},
+  {es:"llegar",de:"ankommen",cat:"Verb",ex:"Llego a las ocho."},
+  {es:"salir",de:"ausgehen / weggehen",cat:"Verb",ex:"Salgo a las siete."},
+  {es:"poner",de:"stellen / legen",cat:"Verb",ex:"Pon el libro aquí."},
+  {es:"traer",de:"bringen / mitbringen",cat:"Verb",ex:"Trae la mochila."},
+  {es:"dar",de:"geben",cat:"Verb",ex:"Dame el dinero."},
+  {es:"decir",de:"sagen",cat:"Verb",ex:"¿Qué dices?"},
+  {es:"hablar",de:"sprechen / reden",cat:"Verb",ex:"Hablo español un poco."},
+  {es:"escuchar",de:"hören / zuhören",cat:"Verb",ex:"Escucha la música."},
+  {es:"ver",de:"sehen / schauen",cat:"Verb",ex:"Veo la televisión."},
+  {es:"mirar",de:"anschauen",cat:"Verb",ex:"Mira la foto."},
+  {es:"leer",de:"lesen",cat:"Verb",ex:"Leo libros cada día."},
+  {es:"escribir",de:"schreiben",cat:"Verb",ex:"Escribo un email."},
+  {es:"comer",de:"essen",cat:"Verb",ex:"Como a las dos."},
+  {es:"beber",de:"trinken",cat:"Verb",ex:"Bebo agua."},
+  {es:"dormir",de:"schlafen",cat:"Verb",ex:"Duermo ocho horas."},
+  {es:"vivir",de:"leben / wohnen",cat:"Verb",ex:"Vivo en Berlín."},
+  {es:"trabajar",de:"arbeiten",cat:"Verb",ex:"Trabajo en una oficina."},
+  {es:"estudiar",de:"studieren / lernen",cat:"Verb",ex:"Estudio español."},
+  {es:"aprender",de:"lernen",cat:"Verb",ex:"Aprendo rápido."},
+  {es:"enseñar",de:"unterrichten / zeigen",cat:"Verb",ex:"Ella enseña matemáticas."},
+  {es:"comprar",de:"kaufen",cat:"Verb",ex:"Compro comida."},
+  {es:"vender",de:"verkaufen",cat:"Verb",ex:"Vendo mi coche."},
+  {es:"pagar",de:"bezahlen",cat:"Verb",ex:"Pago con tarjeta."},
+  {es:"necesitar",de:"brauchen / benötigen",cat:"Verb",ex:"Necesito ayuda."},
+  {es:"buscar",de:"suchen",cat:"Verb",ex:"Busco trabajo."},
+  {es:"encontrar",de:"finden",cat:"Verb",ex:"Encuentro mi llave."},
+  {es:"conocer",de:"kennen (Personen)",cat:"Verb",ex:"Conozco a María."},
+  {es:"entender",de:"verstehen",cat:"Verb",ex:"No entiendo."},
+  {es:"creer",de:"glauben / denken",cat:"Verb",ex:"Creo que sí."},
+  {es:"pensar",de:"denken / nachdenken",cat:"Verb",ex:"Pienso en ti."},
+  {es:"sentir",de:"fühlen / bereuen",cat:"Verb",ex:"Siento mucho."},
+  {es:"llamar",de:"rufen / anrufen",cat:"Verb",ex:"Llama a tu madre."},
+  {es:"esperar",de:"warten / hoffen",cat:"Verb",ex:"Espero el autobús."},
+  {es:"ayudar",de:"helfen",cat:"Verb",ex:"¿Puedes ayudarme?"},
+  {es:"usar",de:"benutzen / verwenden",cat:"Verb",ex:"Uso el móvil."},
+  {es:"abrir",de:"öffnen / aufmachen",cat:"Verb",ex:"Abre la puerta."},
+  {es:"cerrar",de:"schließen",cat:"Verb",ex:"Cierra la ventana."},
+  {es:"empezar",de:"anfangen / beginnen",cat:"Verb",ex:"Empiezo a las nueve."},
+  {es:"terminar",de:"beenden / enden",cat:"Verb",ex:"Termino a las cinco."},
+  {es:"cambiar",de:"wechseln / ändern",cat:"Verb",ex:"Cambio de opinión."},
+  {es:"volver",de:"zurückkommen",cat:"Verb",ex:"Vuelvo a casa."},
+  {es:"pasar",de:"passieren / verbringen",cat:"Verb",ex:"¿Qué pasó?"},
+  {es:"quedar",de:"bleiben / treffen",cat:"Verb",ex:"¿Quedamos mañana?"},
+  {es:"llevar",de:"tragen / mitbringen",cat:"Verb",ex:"Lleva un abrigo."},
+  {es:"dejar",de:"lassen / verlassen",cat:"Verb",ex:"Deja el libro aquí."},
+  {es:"seguir",de:"weitermachen / folgen",cat:"Verb",ex:"Sigue recto."},
+  {es:"subir",de:"hochgehen / hochladen",cat:"Verb",ex:"Sube las escaleras."},
+  {es:"bajar",de:"runtergehen / herunterladen",cat:"Verb",ex:"Baja el volumen."},
+  {es:"ganar",de:"gewinnen / verdienen",cat:"Verb",ex:"Gana mucho dinero."},
+  {es:"perder",de:"verlieren / verlegen",cat:"Verb",ex:"Pierdo mis llaves."},
+  {es:"jugar",de:"spielen",cat:"Verb",ex:"Juego al fútbol."},
+  {es:"correr",de:"laufen / rennen",cat:"Verb",ex:"Corro por las mañanas."},
+  {es:"caminar",de:"spazieren / zu Fuß gehen",cat:"Verb",ex:"Camino al trabajo."},
+  {es:"nadar",de:"schwimmen",cat:"Verb",ex:"Nado en el mar."},
+  {es:"cocinar",de:"kochen",cat:"Verb",ex:"Cocino para mis amigos."},
+  {es:"limpiar",de:"putzen / sauber machen",cat:"Verb",ex:"Limpio la cocina."},
+  {es:"preguntar",de:"fragen",cat:"Verb",ex:"Pregunto al profesor."},
+  {es:"contestar",de:"antworten",cat:"Verb",ex:"Contesta la pregunta."},
+  {es:"invitar",de:"einladen",cat:"Verb",ex:"Te invito a cenar."},
+  {es:"visitar",de:"besuchen",cat:"Verb",ex:"Visito a mis abuelos."},
+  {es:"viajar",de:"reisen",cat:"Verb",ex:"Viajo mucho."},
+  {es:"reservar",de:"reservieren / buchen",cat:"Verb",ex:"Reservo una mesa."},
+  {es:"pedir",de:"bitten / bestellen",cat:"Verb",ex:"Pido un café."},
+  {es:"recibir",de:"erhalten / empfangen",cat:"Verb",ex:"Recibo un regalo."},
+  {es:"enviar",de:"senden / schicken",cat:"Verb",ex:"Envío un mensaje."},
+  {es:"mostrar",de:"zeigen",cat:"Verb",ex:"Muéstrame el mapa."},
+  {es:"explicar",de:"erklären",cat:"Verb",ex:"Explica la lección."},
+  {es:"recordar",de:"erinnern / sich erinnern",cat:"Verb",ex:"Recuerdo tu nombre."},
+  {es:"olvidar",de:"vergessen",cat:"Verb",ex:"Olvido todo."},
+  {es:"imaginar",de:"sich vorstellen",cat:"Verb",ex:"Imagina un mundo mejor."},
+  // NOUNS - People
+  {es:"persona",de:"Person / Mensch",cat:"Nomen",ex:"Esa persona es simpática."},
+  {es:"hombre",de:"Mann",cat:"Nomen",ex:"El hombre trabaja."},
+  {es:"mujer",de:"Frau",cat:"Nomen",ex:"La mujer sonríe."},
+  {es:"niño",de:"Kind / Junge",cat:"Nomen",ex:"El niño juega."},
+  {es:"niña",de:"Mädchen",cat:"Nomen",ex:"La niña canta."},
+  {es:"amigo",de:"Freund",cat:"Nomen",ex:"Mi amigo vive aquí."},
+  {es:"amiga",de:"Freundin",cat:"Nomen",ex:"Mi amiga habla rápido."},
+  {es:"familia",de:"Familie",cat:"Nomen",ex:"Mi familia es grande."},
+  {es:"padre",de:"Vater",cat:"Nomen",ex:"Mi padre es médico."},
+  {es:"madre",de:"Mutter",cat:"Nomen",ex:"Mi madre cocina bien."},
+  {es:"hijo",de:"Sohn",cat:"Nomen",ex:"Tengo un hijo."},
+  {es:"hija",de:"Tochter",cat:"Nomen",ex:"Mi hija estudia."},
+  {es:"hermano",de:"Bruder",cat:"Nomen",ex:"Mi hermano es mayor."},
+  {es:"hermana",de:"Schwester",cat:"Nomen",ex:"Mi hermana baila."},
+  {es:"abuelo",de:"Großvater / Opa",cat:"Nomen",ex:"Mi abuelo tiene 80 años."},
+  {es:"abuela",de:"Großmutter / Oma",cat:"Nomen",ex:"Mi abuela cocina muy bien."},
+  {es:"esposo",de:"Ehemann",cat:"Nomen",ex:"Mi esposo trabaja."},
+  {es:"esposa",de:"Ehefrau",cat:"Nomen",ex:"Mi esposa es profesora."},
+  {es:"novio",de:"Freund / Verlobter",cat:"Nomen",ex:"Mi novio es alemán."},
+  {es:"novia",de:"Freundin / Verlobte",cat:"Nomen",ex:"Mi novia es española."},
+  {es:"vecino",de:"Nachbar",cat:"Nomen",ex:"Mi vecino es simpático."},
+  {es:"jefe",de:"Chef / Vorgesetzter",cat:"Nomen",ex:"Mi jefe es estricto."},
+  {es:"compañero",de:"Kollege / Mitschüler",cat:"Nomen",ex:"Mi compañero ayuda."},
+  // NOUNS - Places
+  {es:"casa",de:"Haus / Zuhause",cat:"Nomen",ex:"Estoy en casa."},
+  {es:"ciudad",de:"Stadt",cat:"Nomen",ex:"La ciudad es grande."},
+  {es:"pueblo",de:"Dorf / kleine Stadt",cat:"Nomen",ex:"Vivo en un pueblo."},
+  {es:"país",de:"Land (Nation)",cat:"Nomen",ex:"Mi país es Alemania."},
+  {es:"calle",de:"Straße",cat:"Nomen",ex:"Vivo en esta calle."},
+  {es:"plaza",de:"Platz",cat:"Nomen",ex:"La plaza es grande."},
+  {es:"tienda",de:"Geschäft / Laden",cat:"Nomen",ex:"La tienda está cerrada."},
+  {es:"supermercado",de:"Supermarkt",cat:"Nomen",ex:"Voy al supermercado."},
+  {es:"mercado",de:"Markt",cat:"Nomen",ex:"El mercado es antiguo."},
+  {es:"restaurante",de:"Restaurant",cat:"Nomen",ex:"El restaurante es bueno."},
+  {es:"bar",de:"Bar / Kneipe",cat:"Nomen",ex:"Vamos al bar."},
+  {es:"café",de:"Café / Kaffee",cat:"Nomen",ex:"El café está cerca."},
+  {es:"hotel",de:"Hotel",cat:"Nomen",ex:"El hotel es caro."},
+  {es:"hospital",de:"Krankenhaus",cat:"Nomen",ex:"El hospital está lejos."},
+  {es:"escuela",de:"Schule",cat:"Nomen",ex:"La escuela empieza a las ocho."},
+  {es:"universidad",de:"Universität",cat:"Nomen",ex:"Estudio en la universidad."},
+  {es:"biblioteca",de:"Bibliothek",cat:"Nomen",ex:"La biblioteca está abierta."},
+  {es:"oficina",de:"Büro",cat:"Nomen",ex:"Trabajo en la oficina."},
+  {es:"banco",de:"Bank",cat:"Nomen",ex:"El banco cierra a las tres."},
+  {es:"iglesia",de:"Kirche",cat:"Nomen",ex:"La iglesia es antigua."},
+  {es:"aeropuerto",de:"Flughafen",cat:"Nomen",ex:"El aeropuerto está lejos."},
+  {es:"estación",de:"Bahnhof / Station",cat:"Nomen",ex:"La estación es moderna."},
+  {es:"parada",de:"Haltestelle",cat:"Nomen",ex:"La parada está aquí."},
+  {es:"playa",de:"Strand",cat:"Nomen",ex:"La playa es hermosa."},
+  {es:"montaña",de:"Berg",cat:"Nomen",ex:"La montaña es alta."},
+  {es:"río",de:"Fluss",cat:"Nomen",ex:"El río es largo."},
+  {es:"mar",de:"Meer",cat:"Nomen",ex:"El mar es azul."},
+  {es:"parque",de:"Park",cat:"Nomen",ex:"El parque está cerca."},
+  {es:"jardín",de:"Garten",cat:"Nomen",ex:"El jardín es bonito."},
+  // NOUNS - Things
+  {es:"cosa",de:"Sache / Ding",cat:"Nomen",ex:"¿Qué cosa es esa?"},
+  {es:"libro",de:"Buch",cat:"Nomen",ex:"Leo un libro."},
+  {es:"papel",de:"Papier",cat:"Nomen",ex:"Dame el papel."},
+  {es:"lápiz",de:"Bleistift",cat:"Nomen",ex:"¿Tienes un lápiz?"},
+  {es:"bolígrafo",de:"Kugelschreiber",cat:"Nomen",ex:"El bolígrafo no funciona."},
+  {es:"mesa",de:"Tisch",cat:"Nomen",ex:"La mesa es de madera."},
+  {es:"silla",de:"Stuhl",cat:"Nomen",ex:"La silla es cómoda."},
+  {es:"cama",de:"Bett",cat:"Nomen",ex:"La cama es grande."},
+  {es:"puerta",de:"Tür",cat:"Nomen",ex:"Abre la puerta."},
+  {es:"ventana",de:"Fenster",cat:"Nomen",ex:"Cierra la ventana."},
+  {es:"teléfono",de:"Telefon",cat:"Nomen",ex:"Mi teléfono está roto."},
+  {es:"móvil",de:"Handy",cat:"Nomen",ex:"Uso el móvil todo el día."},
+  {es:"ordenador",de:"Computer (Spanien)",cat:"Nomen",ex:"Mi ordenador es rápido."},
+  {es:"computadora",de:"Computer (Latam)",cat:"Nomen",ex:"La computadora está lenta."},
+  {es:"internet",de:"Internet",cat:"Nomen",ex:"Necesito internet."},
+  {es:"dinero",de:"Geld",cat:"Nomen",ex:"No tengo dinero."},
+  {es:"tarjeta",de:"Karte (Kredit-/Ausweis)",cat:"Nomen",ex:"Pago con tarjeta."},
+  {es:"llave",de:"Schlüssel",cat:"Nomen",ex:"¿Dónde están las llaves?"},
+  {es:"bolso",de:"Tasche / Handtasche",cat:"Nomen",ex:"Mi bolso es negro."},
+  {es:"mochila",de:"Rucksack",cat:"Nomen",ex:"La mochila pesa mucho."},
+  {es:"ropa",de:"Kleidung",cat:"Nomen",ex:"Necesito ropa nueva."},
+  {es:"camisa",de:"Hemd",cat:"Nomen",ex:"La camisa es azul."},
+  {es:"pantalón",de:"Hose",cat:"Nomen",ex:"El pantalón es negro."},
+  {es:"zapatos",de:"Schuhe",cat:"Nomen",ex:"Los zapatos son cómodos."},
+  {es:"abrigo",de:"Mantel",cat:"Nomen",ex:"Lleva un abrigo."},
+  // NOUNS - Food & Drink
+  {es:"comida",de:"Essen / Mahlzeit",cat:"Essen",ex:"La comida está rica."},
+  {es:"agua",de:"Wasser",cat:"Essen",ex:"Bebo agua."},
+  {es:"vino",de:"Wein",cat:"Essen",ex:"El vino es español."},
+  {es:"cerveza",de:"Bier",cat:"Essen",ex:"Una cerveza, por favor."},
+  {es:"café",de:"Kaffee",cat:"Essen",ex:"Tomo café por las mañanas."},
+  {es:"leche",de:"Milch",cat:"Essen",ex:"La leche es fresca."},
+  {es:"pan",de:"Brot",cat:"Essen",ex:"El pan está caliente."},
+  {es:"carne",de:"Fleisch",cat:"Essen",ex:"No como carne."},
+  {es:"pescado",de:"Fisch",cat:"Essen",ex:"El pescado es delicioso."},
+  {es:"arroz",de:"Reis",cat:"Essen",ex:"Como arroz todos los días."},
+  {es:"pasta",de:"Pasta / Nudeln",cat:"Essen",ex:"La pasta es mi favorita."},
+  {es:"verdura",de:"Gemüse",cat:"Essen",ex:"Como mucha verdura."},
+  {es:"fruta",de:"Obst",cat:"Essen",ex:"La fruta es sana."},
+  {es:"ensalada",de:"Salat",cat:"Essen",ex:"La ensalada está fresca."},
+  {es:"sopa",de:"Suppe",cat:"Essen",ex:"La sopa está caliente."},
+  {es:"postre",de:"Nachtisch / Dessert",cat:"Essen",ex:"El postre es dulce."},
+  {es:"desayuno",de:"Frühstück",cat:"Essen",ex:"El desayuno es a las ocho."},
+  {es:"almuerzo",de:"Mittagessen",cat:"Essen",ex:"El almuerzo es a las dos."},
+  {es:"cena",de:"Abendessen",cat:"Essen",ex:"La cena es a las nueve."},
+  // TIME
+  {es:"tiempo",de:"Zeit / Wetter",cat:"Zeit",ex:"No tengo tiempo."},
+  {es:"hora",de:"Stunde / Uhrzeit",cat:"Zeit",ex:"¿Qué hora es?"},
+  {es:"día",de:"Tag",cat:"Zeit",ex:"Buenos días."},
+  {es:"semana",de:"Woche",cat:"Zeit",ex:"Esta semana trabajo mucho."},
+  {es:"mes",de:"Monat",cat:"Zeit",ex:"El mes de julio."},
+  {es:"año",de:"Jahr",cat:"Zeit",ex:"El año pasado."},
+  {es:"hoy",de:"heute",cat:"Zeit",ex:"Hoy es lunes."},
+  {es:"mañana",de:"morgen / der Morgen",cat:"Zeit",ex:"Mañana es martes."},
+  {es:"ayer",de:"gestern",cat:"Zeit",ex:"Ayer fui al cine."},
+  {es:"ahora",de:"jetzt",cat:"Zeit",ex:"Ahora mismo."},
+  {es:"después",de:"danach / nachher",cat:"Zeit",ex:"Después comemos."},
+  {es:"antes",de:"vorher / früher",cat:"Zeit",ex:"Antes vivía en Madrid."},
+  {es:"pronto",de:"bald",cat:"Zeit",ex:"Hasta pronto."},
+  {es:"tarde",de:"spät / Nachmittag",cat:"Zeit",ex:"Llego tarde."},
+  {es:"temprano",de:"früh",cat:"Zeit",ex:"Me levanto temprano."},
+  {es:"siempre",de:"immer",cat:"Zeit",ex:"Siempre llego a tiempo."},
+  {es:"nunca",de:"nie / niemals",cat:"Zeit",ex:"Nunca como carne."},
+  {es:"a veces",de:"manchmal",cat:"Zeit",ex:"A veces llueve."},
+  {es:"muchas veces",de:"oft / häufig",cat:"Zeit",ex:"Muchas veces olvido."},
+  {es:"ya",de:"schon / bereits",cat:"Zeit",ex:"Ya he comido."},
+  {es:"todavía",de:"noch / immer noch",cat:"Zeit",ex:"Todavía no llegó."},
+  {es:"por la mañana",de:"morgens",cat:"Zeit",ex:"Como por la mañana."},
+  {es:"por la tarde",de:"nachmittags",cat:"Zeit",ex:"Trabajo por la tarde."},
+  {es:"por la noche",de:"abends / nachts",cat:"Zeit",ex:"Duermo por la noche."},
+  {es:"lunes",de:"Montag",cat:"Zeit",ex:"El lunes trabajo."},
+  {es:"martes",de:"Dienstag",cat:"Zeit",ex:"El martes tengo clase."},
+  {es:"miércoles",de:"Mittwoch",cat:"Zeit",ex:"El miércoles es festivo."},
+  {es:"jueves",de:"Donnerstag",cat:"Zeit",ex:"El jueves salgo."},
+  {es:"viernes",de:"Freitag",cat:"Zeit",ex:"El viernes es mi día libre."},
+  {es:"sábado",de:"Samstag",cat:"Zeit",ex:"El sábado descanso."},
+  {es:"domingo",de:"Sonntag",cat:"Zeit",ex:"El domingo voy a la iglesia."},
+  {es:"enero",de:"Januar",cat:"Zeit",ex:"Enero es frío."},
+  {es:"febrero",de:"Februar",cat:"Zeit",ex:"Febrero tiene 28 días."},
+  {es:"marzo",de:"März",cat:"Zeit",ex:"Marzo empieza la primavera."},
+  {es:"abril",de:"April",cat:"Zeit",ex:"Abril llueve mucho."},
+  {es:"mayo",de:"Mai",cat:"Zeit",ex:"Mayo es bonito."},
+  {es:"junio",de:"Juni",cat:"Zeit",ex:"Junio empieza el verano."},
+  {es:"julio",de:"Juli",cat:"Zeit",ex:"Julio es muy caluroso."},
+  {es:"agosto",de:"August",cat:"Zeit",ex:"Agosto es vacaciones."},
+  {es:"septiembre",de:"September",cat:"Zeit",ex:"Septiembre empieza el otoño."},
+  {es:"octubre",de:"Oktober",cat:"Zeit",ex:"Octubre tiene colores bonitos."},
+  {es:"noviembre",de:"November",cat:"Zeit",ex:"Noviembre es gris."},
+  {es:"diciembre",de:"Dezember",cat:"Zeit",ex:"Diciembre es Navidad."},
+  // ADJECTIVES
+  {es:"bueno",de:"gut",cat:"Adjektiv",ex:"Es un buen día."},
+  {es:"malo",de:"schlecht",cat:"Adjektiv",ex:"Tengo mala suerte."},
+  {es:"grande",de:"groß",cat:"Adjektiv",ex:"La ciudad es grande."},
+  {es:"pequeño",de:"klein",cat:"Adjektiv",ex:"El perro es pequeño."},
+  {es:"nuevo",de:"neu",cat:"Adjektiv",ex:"Tengo un coche nuevo."},
+  {es:"viejo",de:"alt",cat:"Adjektiv",ex:"El edificio es viejo."},
+  {es:"joven",de:"jung",cat:"Adjektiv",ex:"Soy joven."},
+  {es:"antiguo",de:"alt / antik",cat:"Adjektiv",ex:"Es un edificio antiguo."},
+  {es:"moderno",de:"modern",cat:"Adjektiv",ex:"El diseño es moderno."},
+  {es:"bonito",de:"schön / hübsch",cat:"Adjektiv",ex:"La vista es bonita."},
+  {es:"feo",de:"hässlich",cat:"Adjektiv",ex:"El tiempo es feo."},
+  {es:"interesante",de:"interessant",cat:"Adjektiv",ex:"El libro es interesante."},
+  {es:"aburrido",de:"langweilig",cat:"Adjektiv",ex:"La clase es aburrida."},
+  {es:"difícil",de:"schwierig",cat:"Adjektiv",ex:"El examen es difícil."},
+  {es:"fácil",de:"einfach / leicht",cat:"Adjektiv",ex:"La tarea es fácil."},
+  {es:"rápido",de:"schnell",cat:"Adjektiv",ex:"El tren es rápido."},
+  {es:"lento",de:"langsam",cat:"Adjektiv",ex:"Mi internet es lento."},
+  {es:"caro",de:"teuer",cat:"Adjektiv",ex:"El hotel es caro."},
+  {es:"barato",de:"günstig / billig",cat:"Adjektiv",ex:"El mercado es barato."},
+  {es:"rico",de:"reich / lecker",cat:"Adjektiv",ex:"La comida es rica."},
+  {es:"pobre",de:"arm",cat:"Adjektiv",ex:"El barrio es pobre."},
+  {es:"feliz",de:"glücklich / froh",cat:"Adjektiv",ex:"Estoy feliz."},
+  {es:"triste",de:"traurig",cat:"Adjektiv",ex:"Estoy triste."},
+  {es:"cansado",de:"müde",cat:"Adjektiv",ex:"Estoy muy cansado."},
+  {es:"enfermo",de:"krank",cat:"Adjektiv",ex:"Estoy enfermo."},
+  {es:"sano",de:"gesund",cat:"Adjektiv",ex:"Estoy sano."},
+  {es:"caliente",de:"heiß / warm",cat:"Adjektiv",ex:"El café está caliente."},
+  {es:"frío",de:"kalt",cat:"Adjektiv",ex:"Hace frío hoy."},
+  {es:"lleno",de:"voll",cat:"Adjektiv",ex:"El vaso está lleno."},
+  {es:"vacío",de:"leer",cat:"Adjektiv",ex:"El vaso está vacío."},
+  {es:"abierto",de:"geöffnet / offen",cat:"Adjektiv",ex:"La tienda está abierta."},
+  {es:"cerrado",de:"geschlossen",cat:"Adjektiv",ex:"El banco está cerrado."},
+  {es:"libre",de:"frei / kostenlos",cat:"Adjektiv",ex:"¿Estás libre esta tarde?"},
+  {es:"ocupado",de:"beschäftigt / besetzt",cat:"Adjektiv",ex:"Estoy muy ocupado."},
+  {es:"importante",de:"wichtig",cat:"Adjektiv",ex:"Es muy importante."},
+  {es:"necesario",de:"notwendig",cat:"Adjektiv",ex:"Es necesario estudiar."},
+  {es:"posible",de:"möglich",cat:"Adjektiv",ex:"¿Es posible?"},
+  {es:"imposible",de:"unmöglich",cat:"Adjektiv",ex:"Es imposible."},
+  {es:"seguro",de:"sicher / gewiss",cat:"Adjektiv",ex:"¿Estás seguro?"},
+  {es:"peligroso",de:"gefährlich",cat:"Adjektiv",ex:"La zona es peligrosa."},
+  {es:"mismo",de:"gleich / selbst",cat:"Adjektiv",ex:"Al mismo tiempo."},
+  {es:"diferente",de:"unterschiedlich",cat:"Adjektiv",ex:"Somos muy diferentes."},
+  {es:"igual",de:"gleich",cat:"Adjektiv",ex:"Son iguales."},
+  {es:"solo",de:"allein / nur",cat:"Adjektiv",ex:"Estoy solo."},
+  {es:"juntos",de:"zusammen",cat:"Adjektiv",ex:"Vamos juntos."},
+  {es:"simpático",de:"sympathisch / nett",cat:"Adjektiv",ex:"Es muy simpático."},
+  {es:"amable",de:"freundlich",cat:"Adjektiv",ex:"Es muy amable."},
+  {es:"inteligente",de:"intelligent / klug",cat:"Adjektiv",ex:"Es muy inteligente."},
+  // NUMBERS
+  {es:"uno",de:"eins",cat:"Zahl",ex:"Uno más uno son dos."},
+  {es:"dos",de:"zwei",cat:"Zahl",ex:"Tengo dos gatos."},
+  {es:"tres",de:"drei",cat:"Zahl",ex:"Son las tres."},
+  {es:"cuatro",de:"vier",cat:"Zahl",ex:"Cuatro personas."},
+  {es:"cinco",de:"fünf",cat:"Zahl",ex:"Cinco minutos."},
+  {es:"seis",de:"sechs",cat:"Zahl",ex:"Seis días."},
+  {es:"siete",de:"sieben",cat:"Zahl",ex:"Siete colores."},
+  {es:"ocho",de:"acht",cat:"Zahl",ex:"Son las ocho."},
+  {es:"nueve",de:"neun",cat:"Zahl",ex:"Nueve meses."},
+  {es:"diez",de:"zehn",cat:"Zahl",ex:"Diez euros."},
+  {es:"once",de:"elf",cat:"Zahl",ex:"Once personas."},
+  {es:"doce",de:"zwölf",cat:"Zahl",ex:"Doce meses."},
+  {es:"veinte",de:"zwanzig",cat:"Zahl",ex:"Veinte años."},
+  {es:"cien",de:"hundert",cat:"Zahl",ex:"Cien euros."},
+  {es:"mil",de:"tausend",cat:"Zahl",ex:"Mil personas."},
+  {es:"primero",de:"erste(r/s)",cat:"Zahl",ex:"El primero de enero."},
+  {es:"segundo",de:"zweite(r/s)",cat:"Zahl",ex:"El segundo piso."},
+  {es:"tercero",de:"dritte(r/s)",cat:"Zahl",ex:"La tercera vez."},
+  // ADVERBS & PREPOSITIONS
+  {es:"muy",de:"sehr",cat:"Adverb",ex:"Es muy interesante."},
+  {es:"mucho",de:"viel / sehr",cat:"Adverb",ex:"Trabajo mucho."},
+  {es:"poco",de:"wenig / etwas",cat:"Adverb",ex:"Hablo poco español."},
+  {es:"más",de:"mehr",cat:"Adverb",ex:"Quiero más."},
+  {es:"menos",de:"weniger",cat:"Adverb",ex:"Menos ruido, por favor."},
+  {es:"demasiado",de:"zu viel",cat:"Adverb",ex:"Comes demasiado."},
+  {es:"bastante",de:"genug / ziemlich",cat:"Adverb",ex:"Es bastante bueno."},
+  {es:"bien",de:"gut / wohl",cat:"Adverb",ex:"Habla muy bien."},
+  {es:"mal",de:"schlecht",cat:"Adverb",ex:"Me siento mal."},
+  {es:"aquí",de:"hier",cat:"Adverb",ex:"Estoy aquí."},
+  {es:"allí",de:"dort",cat:"Adverb",ex:"Está allí."},
+  {es:"cerca",de:"nah / in der Nähe",cat:"Adverb",ex:"Está muy cerca."},
+  {es:"lejos",de:"weit / entfernt",cat:"Adverb",ex:"Está muy lejos."},
+  {es:"arriba",de:"oben",cat:"Adverb",ex:"Vivo arriba."},
+  {es:"abajo",de:"unten",cat:"Adverb",ex:"El sótano está abajo."},
+  {es:"dentro",de:"drinnen / innen",cat:"Adverb",ex:"Están dentro."},
+  {es:"fuera",de:"draußen / außen",cat:"Adverb",ex:"Espera fuera."},
+  {es:"delante",de:"vorne / davor",cat:"Adverb",ex:"Está delante de mí."},
+  {es:"detrás",de:"hinten / dahinter",cat:"Adverb",ex:"Está detrás de la puerta."},
+  {es:"también",de:"auch",cat:"Adverb",ex:"Yo también quiero."},
+  {es:"tampoco",de:"auch nicht",cat:"Adverb",ex:"Yo tampoco sé."},
+  {es:"sí",de:"ja",cat:"Adverb",ex:"Sí, claro."},
+  {es:"no",de:"nein / nicht",cat:"Adverb",ex:"No, gracias."},
+  {es:"quizás",de:"vielleicht",cat:"Adverb",ex:"Quizás mañana."},
+  {es:"de",de:"von / aus / von",cat:"Prep.",ex:"Soy de Alemania."},
+  {es:"en",de:"in / an / auf",cat:"Prep.",ex:"Estoy en casa."},
+  {es:"a",de:"zu / nach / um",cat:"Prep.",ex:"Voy a Madrid."},
+  {es:"con",de:"mit",cat:"Prep.",ex:"Café con leche."},
+  {es:"sin",de:"ohne",cat:"Prep.",ex:"Sin azúcar."},
+  {es:"por",de:"für / durch / wegen",cat:"Prep.",ex:"Gracias por todo."},
+  {es:"para",de:"für / um ... zu",cat:"Prep.",ex:"Es para ti."},
+  {es:"sobre",de:"über / auf",cat:"Prep.",ex:"Habla sobre el libro."},
+  {es:"entre",de:"zwischen",cat:"Prep.",ex:"Entre tú y yo."},
+  {es:"hasta",de:"bis",cat:"Prep.",ex:"Hasta mañana."},
+  {es:"desde",de:"seit / von",cat:"Prep.",ex:"Desde las ocho."},
+  {es:"durante",de:"während",cat:"Prep.",ex:"Durante el día."},
+  // QUESTION WORDS
+  {es:"qué",de:"was",cat:"Fragewort",ex:"¿Qué quieres?"},
+  {es:"quién",de:"wer",cat:"Fragewort",ex:"¿Quién eres?"},
+  {es:"dónde",de:"wo",cat:"Fragewort",ex:"¿Dónde estás?"},
+  {es:"cuándo",de:"wann",cat:"Fragewort",ex:"¿Cuándo llegas?"},
+  {es:"cómo",de:"wie",cat:"Fragewort",ex:"¿Cómo estás?"},
+  {es:"por qué",de:"warum",cat:"Fragewort",ex:"¿Por qué no vienes?"},
+  {es:"cuánto",de:"wie viel",cat:"Fragewort",ex:"¿Cuánto cuesta?"},
+  {es:"cuántos",de:"wie viele",cat:"Fragewort",ex:"¿Cuántos años tienes?"},
+  {es:"cuál",de:"welche(r/s)",cat:"Fragewort",ex:"¿Cuál prefieres?"},
+  // CONJUNCTIONS
+  {es:"y",de:"und",cat:"Konj.",ex:"Tú y yo."},
+  {es:"o",de:"oder",cat:"Konj.",ex:"¿Café o té?"},
+  {es:"pero",de:"aber",cat:"Konj.",ex:"Quiero, pero no puedo."},
+  {es:"porque",de:"weil",cat:"Konj.",ex:"No voy porque llueve."},
+  {es:"que",de:"dass / der/die/das",cat:"Konj.",ex:"Creo que sí."},
+  {es:"si",de:"wenn / ob",cat:"Konj.",ex:"Si quieres, ven."},
+  {es:"aunque",de:"obwohl",cat:"Konj.",ex:"Voy aunque llueva."},
+  {es:"cuando",de:"wenn / als",cat:"Konj.",ex:"Llama cuando llegues."},
+  // GREETINGS & PHRASES
+  {es:"hola",de:"Hallo",cat:"Phrase",ex:"¡Hola! ¿Qué tal?"},
+  {es:"adiós",de:"Tschüss / Auf Wiedersehen",cat:"Phrase",ex:"¡Adiós! Hasta luego."},
+  {es:"buenos días",de:"Guten Morgen",cat:"Phrase",ex:"¡Buenos días!"},
+  {es:"buenas tardes",de:"Guten Tag / Nachmittag",cat:"Phrase",ex:"¡Buenas tardes!"},
+  {es:"buenas noches",de:"Gute Nacht",cat:"Phrase",ex:"¡Buenas noches!"},
+  {es:"por favor",de:"bitte",cat:"Phrase",ex:"Un café, por favor."},
+  {es:"gracias",de:"danke",cat:"Phrase",ex:"¡Muchas gracias!"},
+  {es:"de nada",de:"bitte / gern geschehen",cat:"Phrase",ex:"—Gracias. —De nada."},
+  {es:"perdón",de:"Entschuldigung / Verzeihung",cat:"Phrase",ex:"¡Perdón!"},
+  {es:"lo siento",de:"Es tut mir leid",cat:"Phrase",ex:"Lo siento mucho."},
+  {es:"¿cómo estás?",de:"Wie geht es dir?",cat:"Phrase",ex:"¿Cómo estás hoy?"},
+  {es:"muy bien",de:"sehr gut",cat:"Phrase",ex:"Muy bien, gracias."},
+  {es:"no entiendo",de:"Ich verstehe nicht.",cat:"Phrase",ex:"No entiendo la pregunta."},
+  {es:"no sé",de:"Ich weiß nicht.",cat:"Phrase",ex:"No sé la respuesta."},
+  {es:"¿hablas inglés?",de:"Sprichst du Englisch?",cat:"Phrase",ex:"¿Hablas inglés o alemán?"},
+  {es:"¿cuánto cuesta?",de:"Wie viel kostet das?",cat:"Phrase",ex:"¿Cuánto cuesta este libro?"},
+  {es:"ayuda",de:"Hilfe",cat:"Phrase",ex:"¡Ayuda, por favor!"},
+  {es:"claro",de:"klar / natürlich",cat:"Phrase",ex:"Claro que sí."},
+  {es:"vale",de:"OK / in Ordnung (Spanien)",cat:"Phrase",ex:"Vale, nos vemos mañana."},
+  // BODY
+  {es:"cuerpo",de:"Körper",cat:"Körper",ex:"El cuerpo humano."},
+  {es:"cabeza",de:"Kopf",cat:"Körper",ex:"Me duele la cabeza."},
+  {es:"cara",de:"Gesicht",cat:"Körper",ex:"Tiene una cara bonita."},
+  {es:"ojo",de:"Auge",cat:"Körper",ex:"Tiene ojos azules."},
+  {es:"boca",de:"Mund",cat:"Körper",ex:"Cierra la boca."},
+  {es:"nariz",de:"Nase",cat:"Körper",ex:"Me duele la nariz."},
+  {es:"oído",de:"Ohr (innen)",cat:"Körper",ex:"Tengo dolor de oído."},
+  {es:"oreja",de:"Ohr (äußerlich)",cat:"Körper",ex:"Las orejas grandes."},
+  {es:"mano",de:"Hand",cat:"Körper",ex:"Deme la mano."},
+  {es:"brazo",de:"Arm",cat:"Körper",ex:"Me duele el brazo."},
+  {es:"pierna",de:"Bein",cat:"Körper",ex:"Me duele la pierna."},
+  {es:"pie",de:"Fuß",cat:"Körper",ex:"Los pies me duelen."},
+  {es:"corazón",de:"Herz",cat:"Körper",ex:"El corazón late rápido."},
+  {es:"espalda",de:"Rücken",cat:"Körper",ex:"Me duele la espalda."},
+  {es:"estómago",de:"Magen",cat:"Körper",ex:"Me duele el estómago."},
+  // HEALTH
+  {es:"salud",de:"Gesundheit",cat:"Gesundheit",ex:"¡Salud! (beim Niesen)"},
+  {es:"médico",de:"Arzt",cat:"Gesundheit",ex:"El médico me ayuda."},
+  {es:"farmacia",de:"Apotheke",cat:"Gesundheit",ex:"La farmacia está cerca."},
+  {es:"pastilla",de:"Tablette / Pille",cat:"Gesundheit",ex:"Tomo una pastilla."},
+  {es:"dolor",de:"Schmerz",cat:"Gesundheit",ex:"Tengo dolor de cabeza."},
+  {es:"fiebre",de:"Fieber",cat:"Gesundheit",ex:"Tengo fiebre."},
+  {es:"alergia",de:"Allergie",cat:"Gesundheit",ex:"Tengo alergia al polvo."},
+  // TRANSPORT
+  {es:"coche",de:"Auto",cat:"Transport",ex:"Tengo un coche rojo."},
+  {es:"autobús",de:"Bus",cat:"Transport",ex:"El autobús llega tarde."},
+  {es:"tren",de:"Zug",cat:"Transport",ex:"El tren es rápido."},
+  {es:"metro",de:"U-Bahn",cat:"Transport",ex:"Cojo el metro."},
+  {es:"avión",de:"Flugzeug",cat:"Transport",ex:"El avión llega a las seis."},
+  {es:"taxi",de:"Taxi",cat:"Transport",ex:"Cojo un taxi."},
+  {es:"bicicleta",de:"Fahrrad",cat:"Transport",ex:"Voy en bicicleta."},
+  {es:"billete",de:"Ticket / Fahrkarte",cat:"Transport",ex:"Necesito un billete."},
+  {es:"viaje",de:"Reise",cat:"Transport",ex:"El viaje fue largo."},
+  {es:"camino",de:"Weg",cat:"Transport",ex:"¿Cuál es el camino?"},
+  // WEATHER & NATURE
+  {es:"tiempo",de:"Wetter / Zeit",cat:"Natur",ex:"¿Qué tiempo hace?"},
+  {es:"sol",de:"Sonne",cat:"Natur",ex:"Hace sol hoy."},
+  {es:"lluvia",de:"Regen",cat:"Natur",ex:"Hay mucha lluvia."},
+  {es:"nieve",de:"Schnee",cat:"Natur",ex:"Hay nieve en la montaña."},
+  {es:"viento",de:"Wind",cat:"Natur",ex:"Hace mucho viento."},
+  {es:"nube",de:"Wolke",cat:"Natur",ex:"Hay nubes hoy."},
+  {es:"calor",de:"Hitze / Wärme",cat:"Natur",ex:"Hace mucho calor."},
+  {es:"árbol",de:"Baum",cat:"Natur",ex:"El árbol es alto."},
+  {es:"flor",de:"Blume",cat:"Natur",ex:"Las flores son bonitas."},
+  {es:"animal",de:"Tier",cat:"Natur",ex:"Me gustan los animales."},
+  {es:"perro",de:"Hund",cat:"Natur",ex:"El perro ladra."},
+  {es:"gato",de:"Katze",cat:"Natur",ex:"El gato duerme."},
+  // ABSTRACT
+  {es:"vida",de:"Leben",cat:"Abstrakt",ex:"La vida es bella."},
+  {es:"mundo",de:"Welt",cat:"Abstrakt",ex:"El mundo es grande."},
+  {es:"trabajo",de:"Arbeit",cat:"Abstrakt",ex:"Busco trabajo."},
+  {es:"problema",de:"Problem",cat:"Abstrakt",ex:"Hay un problema."},
+  {es:"idea",de:"Idee",cat:"Abstrakt",ex:"Tengo una buena idea."},
+  {es:"pregunta",de:"Frage",cat:"Abstrakt",ex:"Tengo una pregunta."},
+  {es:"respuesta",de:"Antwort",cat:"Abstrakt",ex:"No sé la respuesta."},
+  {es:"ejemplo",de:"Beispiel",cat:"Abstrakt",ex:"Por ejemplo."},
+  {es:"información",de:"Information",cat:"Abstrakt",ex:"Necesito información."},
+  {es:"noticia",de:"Nachricht / Neuigkeit",cat:"Abstrakt",ex:"Las noticias son malas."},
+  {es:"historia",de:"Geschichte / Story",cat:"Abstrakt",ex:"La historia es larga."},
+  {es:"música",de:"Musik",cat:"Abstrakt",ex:"Me gusta la música."},
+  {es:"película",de:"Film",cat:"Abstrakt",ex:"Veo una película."},
+  {es:"foto",de:"Foto",cat:"Abstrakt",ex:"Saca una foto."},
+  {es:"color",de:"Farbe",cat:"Abstrakt",ex:"¿Qué color prefieres?"},
+  {es:"nombre",de:"Name",cat:"Abstrakt",ex:"¿Cuál es tu nombre?"},
+  {es:"número",de:"Nummer / Zahl",cat:"Abstrakt",ex:"¿Cuál es tu número?"},
+  {es:"precio",de:"Preis",cat:"Abstrakt",ex:"El precio es alto."},
+  {es:"suerte",de:"Glück",cat:"Abstrakt",ex:"¡Buena suerte!"},
+  {es:"amor",de:"Liebe",cat:"Abstrakt",ex:"El amor es bonito."},
+  {es:"miedo",de:"Angst",cat:"Abstrakt",ex:"Tengo miedo."},
+  {es:"esperanza",de:"Hoffnung",cat:"Abstrakt",ex:"Tengo esperanza."},
+  {es:"razón",de:"Grund / Recht",cat:"Abstrakt",ex:"Tienes razón."},
+  {es:"verdad",de:"Wahrheit",cat:"Abstrakt",ex:"Dime la verdad."},
+  {es:"mentira",de:"Lüge",cat:"Abstrakt",ex:"Eso es una mentira."},
+  {es:"plan",de:"Plan",cat:"Abstrakt",ex:"¿Cuál es el plan?"},
+];
+
+// ── SRS ENGINE (simplified SM-2) ──
+const RATINGS = { AGAIN: 0, HARD: 1, GOOD: 2, EASY: 3 };
+
+function getNextReview(card, rating) {
+  const now = Date.now();
+  let { interval = 0, ease = 2.5, step = 0 } = card;
+
+  if (rating === 0) { // again
+    step = 0; interval = 1; ease = Math.max(1.3, ease - 0.2);
+  } else if (rating === 1) { // hard
+    if (step === 0) interval = 1;
+    else interval = Math.max(1, Math.round(interval * 1.2));
+    ease = Math.max(1.3, ease - 0.15);
+    step = Math.min(step + 1, 3);
+  } else if (rating === 2) { // good
+    if (step === 0) interval = 1;
+    else if (step === 1) interval = 3;
+    else interval = Math.round(interval * ease);
+    step++;
+  } else { // easy
+    if (interval === 0) interval = 4;
+    else interval = Math.round(interval * ease * 1.3);
+    ease += 0.15;
+    step = Math.max(step + 2, 4);
+  }
+
+  return {
+    interval,
+    ease,
+    step,
+    due: now + interval * 24 * 60 * 60 * 1000,
+    lastRating: rating
+  };
+}
+
+function formatDays(card, rating) {
+  const next = getNextReview(card, rating);
+  const d = next.interval;
+  if (d < 1) return '<1 Tag';
+  if (d === 1) return '1 Tag';
+  if (d < 7) return d + ' Tage';
+  if (d < 30) return Math.round(d/7) + ' Wo.';
+  return Math.round(d/30) + ' Mon.';
+}
+
+// ── STATE ──
+let state = { cards: {}, streak: 0, lastDay: null, totalCorrect: 0, totalAnswered: 0 };
+let session = { queue: [], current: -1, done: 0, correct: 0, newSeen: 0 };
+const TODAY = new Date().toDateString();
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('esp_state');
+    if (s) state = JSON.parse(s);
+  } catch(e) {}
+  // Update streak
+  if (state.lastDay !== TODAY) {
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    if (state.lastDay === yesterday.toDateString()) state.streak++;
+    else if (state.lastDay !== TODAY) state.streak = 0;
+    state.lastDay = TODAY;
+  }
+  saveState();
+}
+
+function saveState() {
+  try { localStorage.setItem('esp_state', JSON.stringify(state)); } catch(e) {}
+}
+
+function getCardState(idx) {
+  return state.cards[idx] || { interval: 0, ease: 2.5, step: 0, due: 0, lastRating: -1 };
+}
+
+function getDueCards() {
+  const now = Date.now();
+  return VOCAB.map((_, i) => i).filter(i => {
+    const c = getCardState(i);
+    return c.due <= now || c.interval === 0;
+  });
+}
+
+// ── SESSION ──
+const SESSION_SIZE = 20;
+
+function startSession() {
+  const due = getDueCards();
+  if (due.length === 0) { showDone(true); return; }
+  // Shuffle and limit
+  const shuffled = due.sort(() => Math.random() - 0.5).slice(0, SESSION_SIZE);
+  session = { queue: shuffled, current: 0, done: 0, correct: 0, newSeen: 0 };
+  showScreen('learn');
+  loadCard();
+}
+
+function loadCard() {
+  if (session.current >= session.queue.length) { showDone(false); return; }
+
+  const idx = session.queue[session.current];
+  const vocab = VOCAB[idx];
+  const card = getCardState(idx);
+
+  // UI
+  document.getElementById('card-word').textContent = vocab.es;
+  document.getElementById('card-cat').textContent = vocab.cat;
+  document.getElementById('card-cat-b').textContent = vocab.cat;
+  document.getElementById('card-hint').textContent = vocab.cat;
+  document.getElementById('card-trans').textContent = vocab.de;
+  document.getElementById('card-example').innerHTML = `<span>${vocab.es}:</span> ${vocab.ex}`;
+
+  // Progress
+  const pct = (session.done / session.queue.length * 100).toFixed(0);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${session.done} / ${session.queue.length}`;
+  document.getElementById('queue-count').textContent = (session.queue.length - session.current) + ' übrig';
+
+  // Days hints
+  document.getElementById('days-again').textContent = formatDays(card, 0);
+  document.getElementById('days-hard').textContent  = formatDays(card, 1);
+  document.getElementById('days-good').textContent  = formatDays(card, 2);
+  document.getElementById('days-easy').textContent  = formatDays(card, 3);
+
+  // Reset card
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  document.getElementById('answer-area').classList.remove('visible');
+
+  if (card.interval === 0) session.newSeen++;
+}
+
+function flipCard() {
+  const fc = document.getElementById('flashcard');
+  if (fc.classList.contains('flipped')) return;
+  fc.classList.add('flipped');
+  setTimeout(() => document.getElementById('answer-area').classList.add('visible'), 200);
+}
+
+function answer(rating) {
+  const idx = session.queue[session.current];
+  const card = getCardState(idx);
+  const next = getNextReview(card, rating);
+  state.cards[idx] = next;
+  state.totalAnswered++;
+  if (rating >= 2) { state.totalCorrect++; session.correct++; }
+  session.done++;
+  session.current++;
+  saveState();
+  updateHomeStats();
+  setTimeout(loadCard, 50);
+}
+
+// ── SCREENS ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() { showScreen('home'); updateHomeStats(); }
+function showStats() { showScreen('stats'); updateStatsScreen(); }
+
+function showDone(empty) {
+  showScreen('done');
+  document.getElementById('done-correct').textContent = session.correct || 0;
+  document.getElementById('done-cards').textContent = session.done || 0;
+  document.getElementById('done-new').textContent = session.newSeen || 0;
+  if (empty) {
+    document.querySelector('.done-emoji').textContent = '✅';
+    document.querySelector('.done-title').textContent = 'Alles erledigt!';
+    document.querySelector('.done-sub').textContent = 'Keine fälligen Karten. Komm morgen wieder.';
+  } else {
+    document.querySelector('.done-emoji').textContent = '🎉';
+    document.querySelector('.done-title').textContent = 'Sitzung abgeschlossen!';
+    document.querySelector('.done-sub').textContent = 'Großartig. Regelmäßige Wiederholungen festigen dein Gedächtnis.';
+  }
+  // Update streak
+  state.streak = Math.max(state.streak, 1);
+  state.lastDay = TODAY;
+  saveState();
+}
+
+function updateHomeStats() {
+  const due = getDueCards().length;
+  const learned = Object.values(state.cards).filter(c => c.step >= 2).length;
+  document.getElementById('home-due').textContent = due;
+  document.getElementById('home-learned').textContent = learned;
+  document.getElementById('home-streak').textContent = state.streak;
+}
+
+function updateStatsScreen() {
+  const cards = Object.values(state.cards);
+  const total = cards.length;
+  const mastered = cards.filter(c => c.step >= 4).length;
+  const acc = state.totalAnswered > 0 ? Math.round(state.totalCorrect / state.totalAnswered * 100) + '%' : '—';
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-mastered').textContent = mastered;
+  document.getElementById('s-streak').textContent = state.streak;
+  document.getElementById('s-accuracy').textContent = acc;
+
+  const newC = VOCAB.length - total;
+  const learning = cards.filter(c => c.step >= 1 && c.step < 3).length;
+  const good = cards.filter(c => c.step >= 3 && c.step < 4).length;
+  const master = mastered;
+  const total2 = VOCAB.length;
+
+  const setBar = (id, cnt) => {
+    document.getElementById('lb-' + id).style.width = (cnt / total2 * 100) + '%';
+    document.getElementById('lc-' + id).textContent = cnt;
+  };
+  setBar('new', newC);
+  setBar('learn', learning);
+  setBar('good', good);
+  setBar('master', master);
+}
+
+function resetAll() {
+  state = { cards: {}, streak: 0, lastDay: TODAY, totalCorrect: 0, totalAnswered: 0 };
+  saveState();
+  goHome();
+}
+
+// ── INIT ──
+loadState();
+updateHomeStats();
+</script>
+</body>
+</html>
